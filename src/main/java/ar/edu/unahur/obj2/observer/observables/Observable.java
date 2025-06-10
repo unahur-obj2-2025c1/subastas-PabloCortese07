@@ -14,11 +14,12 @@ public interface Observable {
     
     void agregarOferta(Oferta oferta);
 
-    Integer ultimaOferta();
+    Oferta ultimaOferta();
 
     String ultimoParticipante();
 
     List<Observer> getParticipantes();
     List<Oferta> getOfertas();
 
+    Integer cantDeOfertas();
 }

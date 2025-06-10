@@ -23,11 +23,19 @@ public class ProductoSubatado implements Observable {
     }
 
     @Override
+    public Integer cantDeOfertas(){
+        return ofertas.size();
+    }
+
+    @Override
     public void agregarOferta(Oferta oferta) {
         /*
           agrega una ofertaa la lista de ofertas si el participante pertenece a la lista de participantes
           y notifica a los demas participantes
         */
+        if(!participantes.stream().anyMatch(par -> par.getNombre().equals(oferta.getCliente()))){
+            throw new OfertaSubastadorException("no esta participando en la subasta");
+        }
 
         ofertas.add(oferta);
         participantes.forEach(p -> p.guardarUltimaOferta(oferta));
@@ -54,11 +62,11 @@ public class ProductoSubatado implements Observable {
     }
 
     @Override
-    public Integer ultimaOferta(){
+    public Oferta ultimaOferta(){
         if(ofertas.isEmpty()){
             throw new OfertaSubastadorException("no hay ofertas disponibles");
         }
-        return ofertas.get(ofertas.size()-1).getPrecio();
+        return ofertas.get(ofertas.size()-1);
     }
 
     @Override
