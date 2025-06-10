@@ -13,36 +13,47 @@ public class ProductoSubatado implements Observable {
     private List<Oferta> ofertas = new ArrayList<>();
 
     @Override
+    public List<Observer> getParticipantes(){
+        return this.participantes;
+    }
+
+    @Override
+    public List<Oferta> getOfertas() {
+        return this.ofertas;
+    }
+
+    @Override
     public void agregarOferta(Oferta oferta) {
-        if(participantes.stream().anyMatch(par -> par.getNombre().equals(oferta.getCliente()))){
-            throw new OfertaSubastadorException("no esta participando en la subasta");
-        }
+        /*
+          agrega una ofertaa la lista de ofertas si el participante pertenece a la lista de participantes
+          y notifica a los demas participantes
+        */
+
         ofertas.add(oferta);
+        participantes.forEach(p -> p.guardarUltimaOferta(oferta));
     }
 
     @Override
     public void agregarParticipante(Observer participante) {
+        //agrega un participante en la lista  
         participantes.add(participante);
         
     }
 
     @Override
-    public void notificarAParticipantes() {
-        participantes.forEach(of -> of.actualizarOferta(this.ultimaOferta()));
-    }
-
-    @Override
     public void quitarParticipante(Observer participante) {
+        //remueve participante
         participantes.remove(participante);
         
     }
 
     @Override
     public void reset() {
-        participantes = new ArrayList<>();
-        ofertas = new ArrayList<>();
+        participantes.clear();
+        ofertas.clear();
     }
 
+    @Override
     public Integer ultimaOferta(){
         if(ofertas.isEmpty()){
             throw new OfertaSubastadorException("no hay ofertas disponibles");
@@ -50,11 +61,14 @@ public class ProductoSubatado implements Observable {
         return ofertas.get(ofertas.size()-1).getPrecio();
     }
 
+    @Override
     public String ultimoParticipante(){
         if(participantes.isEmpty()){
             throw new OfertaSubastadorException("no hay participantes");
         }
         return participantes.get(participantes.size() - 1).getNombre();
     }
+
+    
 
 }

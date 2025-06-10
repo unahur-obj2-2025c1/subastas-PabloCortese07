@@ -6,34 +6,44 @@ import ar.edu.unahur.obj2.observer.observables.Observable;
 public class Subastador implements Observer {
 
     private String nombre;
-    private Integer ultimaOferta;
-
-    public Subastador(String nombre){
+    private Oferta ultimaOferta = new Oferta(this.nombre, 0);
+    private Observable producto;
+    private TipoDeSubastador estrategia;
+    
+    public Subastador(String nombre, TipoDeSubastador estrategia){
         this.nombre = nombre;
-        this.ultimaOferta = 0;
+        this.estrategia = estrategia;
     }
 
+    @Override
+    public void setObjetoSubastable(Observable objeto){
+        producto = objeto;
+    }
+    
+    @Override
+    public Oferta getUltimaOferta() {
+        return this.ultimaOferta;
+    }
+    
     @Override
     public String getNombre() {
         return this.nombre;
     }
 
     @Override
-    public void actualizarOferta(Integer valor) {
+    public void guardarUltimaOferta(Oferta valor) {
         ultimaOferta = valor;
         
     }
 
     @Override
-    public void realizarOferta(Observable producto) {
-        Integer nuevaOferta = ultimaOferta + 10;
-        producto.agregarOferta(new Oferta(this.getNombre(),nuevaOferta));
-        
+    public void actualizarOferta() {
+        estrategia.crearOferta(producto, this);
     }
 
     @Override
     public void reset() {
-        ultimaOferta = 0;
+        ultimaOferta = new Oferta(this.nombre, 0);
+        producto = null;
     }
-
 }
