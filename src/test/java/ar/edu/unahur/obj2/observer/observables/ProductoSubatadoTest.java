@@ -7,8 +7,10 @@ import org.junit.jupiter.api.Test;
 
 import ar.edu.unahur.obj2.observer.excepciones.OfertaSubastadorException;
 import ar.edu.unahur.obj2.observer.observadores.Arriesgado;
+import ar.edu.unahur.obj2.observer.observadores.ConLimite;
 import ar.edu.unahur.obj2.observer.observadores.Observer;
 import ar.edu.unahur.obj2.observer.observadores.Subastador;
+import ar.edu.unahur.obj2.observer.observadores.Unico;
 
 class ProductoSubatadoTest {
     Observable producto = new ProductoSubatado();
@@ -113,5 +115,53 @@ class ProductoSubatadoTest {
         );
 
         assertEquals("no esta participando en la subasta", exp.getMessage());
+    }
+
+//-------------
+
+    @Test
+    void seAgreganParticipantesYOfertasAlProductoYEsteGuargaTodoCorrectamente(){
+        this.escenario1();
+        producto.agregarParticipante(gonzager);
+        producto.agregarParticipante(martomau);
+
+        martomau.setObjetoSubastable(producto);
+        gonzager.setObjetoSubastable(producto);
+        
+        martomau.actualizarOferta();
+        gonzager.actualizarOferta();
+        martomau.actualizarOferta();
+
+        assertEquals(2, producto.getParticipantes().size());
+        assertEquals(3, producto.cantDeOfertas());
+    }
+
+    private Observer pablo = new Subastador("Pablo", new ConLimite(30));
+    private Observer juan = new Subastador("juan", new Unico());
+
+    @Test
+    void seHaceUnaNuevaSubastaYLaUltimaOfertaEsDeMartomeu(){
+        this.escenario1();
+        producto.agregarParticipante(pablo);
+        producto.agregarParticipante(juan);
+        producto.agregarParticipante(gonzager);
+        producto.agregarParticipante(martomau);
+
+        martomau.setObjetoSubastable(producto);
+        gonzager.setObjetoSubastable(producto);
+        pablo.setObjetoSubastable(producto);
+        juan.setObjetoSubastable(producto);
+
+        juan.actualizarOferta();
+        pablo.actualizarOferta();
+        martomau.actualizarOferta();
+        pablo.actualizarOferta();
+        gonzager.actualizarOferta();
+        pablo.actualizarOferta();
+        pablo.actualizarOferta();
+        martomau.actualizarOferta();
+
+        assertEquals(producto.ultimaOferta(), martomau.getUltimaOferta());
+        assertEquals(producto.ultimoParticipante(), martomau.getNombre());
     }
 }
